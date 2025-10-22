@@ -1754,16 +1754,44 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVjSEpwYm5Rb1hDSkJiblJ2YVc1bFhDSXBYRzVnWUdBaWZRPT0gLS0+XG5cbmBgYHJcbnByaW50KFwiQW50b2luZVwiKVxuYGBgXG5cbjwhLS0gcm5iLXNvdXJjZS1lbmQgLS0+XG4ifQ== -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJpbnQoXCJBbnRvaW5lXCIpXG5gYGAifQ== -->
-<pre class="r"><code>print(&quot;Antoine&quot;)</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVjbTBvYkdsemRDQTlJR3h6S0NrcFhHNWNibXhwWW5KaGNua29kR2xrZVhabGNuTmxLVnh1WUdCZ0luMD0gLS0+XG5cbmBgYHJcbnJtKGxpc3QgPSBscygpKVxuXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmBgYFxuXG48IS0tIHJuYi1zb3VyY2UtZW5kIC0tPlxuIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm0obGlzdCA9IGxzKCkpXG5cbmxpYnJhcnkodGlkeXZlcnNlKVxuYGBgIn0= -->
+<pre class="r"><code>rm(list = ls())
+
+library(tidyverse)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-output-begin eyJkYXRhIjoiXG48IS0tIHJuYi1zb3VyY2UtYmVnaW4gZXlKa1lYUmhJam9pWUdCZ2NseHVaR0YwWVNBOExTQnlaV0ZrTG1OemRpaGNJbVJwWVdKbGRHVnpMbU56ZGx3aUtWeHVjM1Z0YldGeWVTaGtZWFJoS1Z4dVlHQmdJbjA9IC0tPlxuXG5gYGByXG5kYXRhIDwtIHJlYWQuY3N2KFwiZGlhYmV0ZXMuY3N2XCIpXG5zdW1tYXJ5KGRhdGEpXG5gYGBcblxuPCEtLSBybmItc291cmNlLWVuZCAtLT5cbiJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkLmNzdihcImRpYWJldGVzLmNzdlwiKVxuc3VtbWFyeShkYXRhKVxuYGBgIn0= -->
+<pre class="r"><code>data &lt;- read.csv(&quot;diabetes.csv&quot;)
+summary(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiICBQcmVnbmFuY2llcyAgICAgICAgR2x1Y29zZSAgICAgIEJsb29kUHJlc3N1cmUgICAgU2tpblRoaWNrbmVzcyAgICAgIEluc3VsaW4gICAgICAgICAgIEJNSSAgICAgICBcbiBNaW4uICAgOiAwLjAwMCAgIE1pbi4gICA6ICAwLjAgICBNaW4uICAgOiAgMC4wMCAgIE1pbi4gICA6IDAuMDAgICBNaW4uICAgOiAgMC4wICAgTWluLiAgIDogMC4wMCAgXG4gMXN0IFF1LjogMS4wMDAgICAxc3QgUXUuOiA5OS4wICAgMXN0IFF1LjogNjIuMDAgICAxc3QgUXUuOiAwLjAwICAgMXN0IFF1LjogIDAuMCAgIDFzdCBRdS46MjcuMzAgIFxuIE1lZGlhbiA6IDMuMDAwICAgTWVkaWFuIDoxMTcuMCAgIE1lZGlhbiA6IDcyLjAwICAgTWVkaWFuIDoyMy4wMCAgIE1lZGlhbiA6IDMwLjUgICBNZWRpYW4gOjMyLjAwICBcbiBNZWFuICAgOiAzLjg0NSAgIE1lYW4gICA6MTIwLjkgICBNZWFuICAgOiA2OS4xMSAgIE1lYW4gICA6MjAuNTQgICBNZWFuICAgOiA3OS44ICAgTWVhbiAgIDozMS45OSAgXG4gM3JkIFF1LjogNi4wMDAgICAzcmQgUXUuOjE0MC4yICAgM3JkIFF1LjogODAuMDAgICAzcmQgUXUuOjMyLjAwICAgM3JkIFF1LjoxMjcuMiAgIDNyZCBRdS46MzYuNjAgIFxuIE1heC4gICA6MTcuMDAwICAgTWF4LiAgIDoxOTkuMCAgIE1heC4gICA6MTIyLjAwICAgTWF4LiAgIDo5OS4wMCAgIE1heC4gICA6ODQ2LjAgICBNYXguICAgOjY3LjEwICBcbiBEaWFiZXRlc1BlZGlncmVlRnVuY3Rpb24gICAgICBBZ2UgICAgICAgICAgIE91dGNvbWUgICAgIFxuIE1pbi4gICA6MC4wNzgwICAgICAgICAgICBNaW4uICAgOjIxLjAwICAgTWluLiAgIDowLjAwMCAgXG4gMXN0IFF1LjowLjI0MzcgICAgICAgICAgIDFzdCBRdS46MjQuMDAgICAxc3QgUXUuOjAuMDAwICBcbiBNZWRpYW4gOjAuMzcyNSAgICAgICAgICAgTWVkaWFuIDoyOS4wMCAgIE1lZGlhbiA6MC4wMDAgIFxuIE1lYW4gICA6MC40NzE5ICAgICAgICAgICBNZWFuICAgOjMzLjI0ICAgTWVhbiAgIDowLjM0OSAgXG4gM3JkIFF1LjowLjYyNjIgICAgICAgICAgIDNyZCBRdS46NDEuMDAgICAzcmQgUXUuOjEuMDAwICBcbiBNYXguICAgOjIuNDIwMCAgICAgICAgICAgTWF4LiAgIDo4MS4wMCAgIE1heC4gICA6MS4wMDAgIFxuIn0= -->
+<pre><code>  Pregnancies        Glucose      BloodPressure    SkinThickness      Insulin           BMI       
+ Min.   : 0.000   Min.   :  0.0   Min.   :  0.00   Min.   : 0.00   Min.   :  0.0   Min.   : 0.00  
+ 1st Qu.: 1.000   1st Qu.: 99.0   1st Qu.: 62.00   1st Qu.: 0.00   1st Qu.:  0.0   1st Qu.:27.30  
+ Median : 3.000   Median :117.0   Median : 72.00   Median :23.00   Median : 30.5   Median :32.00  
+ Mean   : 3.845   Mean   :120.9   Mean   : 69.11   Mean   :20.54   Mean   : 79.8   Mean   :31.99  
+ 3rd Qu.: 6.000   3rd Qu.:140.2   3rd Qu.: 80.00   3rd Qu.:32.00   3rd Qu.:127.2   3rd Qu.:36.60  
+ Max.   :17.000   Max.   :199.0   Max.   :122.00   Max.   :99.00   Max.   :846.0   Max.   :67.10  
+ DiabetesPedigreeFunction      Age           Outcome     
+ Min.   :0.0780           Min.   :21.00   Min.   :0.000  
+ 1st Qu.:0.2437           1st Qu.:24.00   1st Qu.:0.000  
+ Median :0.3725           Median :29.00   Median :0.000  
+ Mean   :0.4719           Mean   :33.24   Mean   :0.349  
+ 3rd Qu.:0.6262           3rd Qu.:41.00   3rd Qu.:1.000  
+ Max.   :2.4200           Max.   :81.00   Max.   :1.000  </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQpgYGB7cn0NCnByaW50KCJBbnRvaW5lIikNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIlIgTm90ZWJvb2siDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KYGBge3J9DQpybShsaXN0ID0gbHMoKSkNCmxpYnJhcnkoZHBseXIpDQoNCmBgYA0KDQpgYGB7cn0NCmRhdGEgPC0gcmVhZC5jc3YoImRpYWJldGVzLmNzdiIpDQpzdW1tYXJ5KGRhdGEpDQpgYGANCg0K</div>
 
 
 
