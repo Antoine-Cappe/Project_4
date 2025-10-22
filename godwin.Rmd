@@ -8,11 +8,34 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Ctrl+Shift+Enter*. 
 
 ```{r}
-plot(cars)
+df = read.csv('diabetes.csv')
+df
+summary(df) 
+library(dplyr)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
+```{r}
+cols_with_zeros = c("Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI")
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
+# Remplacer les zéros par NA dans ces colonnes
+df = df %>%
+  mutate(across(all_of(cols_with_zeros), ~na_if(., 0)))
+df
+colSums(is.na(df))
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
+
+```
+
+```{r}
+for (col in cols_with_zeros) {
+  median_value = median(df[[col]], na.rm = TRUE)
+  df[[col]][is.na(df[[col]])] = median_value
+}
+df
+colSums(is.na(df))
+sapply(df[cols_with_zeros], function(x) sum(x == 0))
+
+
+```
+
