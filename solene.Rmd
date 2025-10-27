@@ -2,6 +2,11 @@
 title: "R Notebook"
 output: html_notebook
 ---
+```{r}
+install.packages("dplyr")
+library(dplyr)
+```
+Step 1: Data Cleaning and Preparation 
 
 ```{r}
 data = read.csv('diabetes.csv')
@@ -19,7 +24,65 @@ data$Insulin[data$Insulin == 0] <- NA
 data$BMI[data$BMI == 0] <- NA
 summary(data)
 ```
-```{r}
+Step 2: Feature Transformation and Engineering 
 
+```{r}
+#standard WHO thresholds: underweight, normal weight, overweight, obese
+#got the values from the WHO
+data <- data %>% mutate(BMICategory = case_when(BMI<18.5 ~ 'Underweight', BMI>=18.5 & BMI<25 ~ 'Normal weight', BMI>=25 & BMI<30 ~ 'Overweight', BMI>=30 ~ 'Obese'))
+#data$BMICategory
+data %>% count(BMICategory)
+```
+```{r}
+#blood pressure categories: low, normal, elevated, high 
+data <- data %>% mutate(BPCategory = case_when(BloodPressure<60 ~ 'Low', BloodPressure>=60 & BloodPressure<80 ~ 'Normal',BloodPressure >= 80 & BloodPressure < 90 ~ 'Elevated', BloodPressure >= 90 ~ 'High'))
+data %>% count(BPCategory)
+```
+
+
+```{r}
+values_to_scale <- c('Pregnancies','Glucose', 'BloodPressure','SkinThickness','Insulin','BMI','DiabetesPedigreeFunction','Age')
+#scale gives a mean of 0 and a standard deviation of 1
+data[values_to_scale] <- scale(data[values_to_scale])
+summary(data) #to check the mean 
+sd(data$Pregnancies) #to check the standard deviation 
+```
+```{r}
+#adding an outcome column for interpretability
+data <- data %>% mutate(OutcomeLabel = case_when(Outcome==0 ~ 'Not Diabetic', Outcome==1 ~ 'Diabetic'))
+data %>% count(OutcomeLabel)
+```
+
+Step 3: Visualisation and Exploration 
+
+```{r}
+library(ggplot2)
+
+density(data$Glucose)
+#does not work yet because of the NA values that need to be replaced
+
+```
+
+```{r}
+#distribution of BMI and age between diabetic and non-diabetic patients 
+
+plot_bmi <- ggplot(data, aes(x=BMI, fill=OutcomeLabel)) + labs(title = 'BMI distribution', x='BMI', fill='(No)Diabetes') + geom_density(alpha = 0.5) 
+  
+plot_age <- ggplot(data, aes(x=Age, fill=OutcomeLabel)) + labs(title = 'Age distribution', x='Age', fill='(No)Diabetes') + geom_density(alpha = 0.5)
+
+plot_bmi
+plot_age
+
+```
+```{r}
+install.packages("ggcorrplot")
+library(ggcorrplot)
+```
+
+```{r}
+#correlation matrix 
+num_data <- data[sapply(data, is.numeric)] #in the mean time, took off the NA values but they should be replaced to avoid deleting too many rows 
+#cor(num_data)
+ggcorrplot(cor(num_data))
 ```
 
