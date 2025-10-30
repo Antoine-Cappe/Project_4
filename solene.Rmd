@@ -86,3 +86,25 @@ num_data <- data[sapply(data, is.numeric)] #in the mean time, took off the NA va
 ggcorrplot(cor(num_data))
 ```
 
+```{r}
+#Age vs DiabetesPedigreeFunction  
+
+plot_diabetes_age <- ggplot(data, aes(x=Age, y=DiabetesPedigreeFunction, color=OutcomeLabel)) + labs(title = 'Age vs DiabetesPedigreeFunction', x='Age', y='DiabetesPedigreeFunction', color='(Not)Diabetic') + geom_point(alpha = 0.5,size=2) 
+plot_diabetes_age
+
+```
+
+```{r}
+#two other maybe pertinent plots idk 
+
+plot_diabetes_bmi <- ggplot(data, aes(x=BMI, y=DiabetesPedigreeFunction, color=OutcomeLabel)) + labs(title = 'BMI vs DiabetesPedigreeFunction', x='BMI', y='DiabetesPedigreeFunction', color='(Not)Diabetic') + geom_point(alpha = 0.5,size=2) 
+plot_diabetes_bmi
+
+```
+
+Step 4: Modeling and Prediction (Data Science)
+
+```{r}
+
+```
+
