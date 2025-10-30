@@ -105,6 +105,35 @@ plot_diabetes_bmi
 Step 4: Modeling and Prediction (Data Science)
 
 ```{r}
+#logistic regression model, we use the generalized linear model  
+
+model <- glm(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = data, family = binomial)
+
+summary(model)
+
+#data$Predict <- predict(model, type='response')
+
+```
+
+```{r}
+#knn model 
+library(class)
+knn_model <- knn()
+#still to do...
+```
+
+```{r}
+install.packages("caret")
+library(caret)
+```
+
+```{r}
+#cross-validation
+training <- trainControl(method='cv',number=10)
+
+model <- train(Outcome ~.,data=data, method = 'glm', family='binomial', trControl=training)
+
+#doesn't work yet because of the NA values 
 
 ```
 
