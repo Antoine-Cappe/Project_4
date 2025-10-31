@@ -39,3 +39,179 @@ sapply(df[cols_with_zeros], function(x) sum(x == 0))
 
 ```
 
+
+```{r}
+rm(list = ls())
+gc()
+library(ggplot2)
+library(dplyr)
+
+# Charger les deux versions du dataset
+df_original <- read.csv("diabetes.csv")
+
+df <- df_original
+cols_with_zeros <- c("Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI")
+
+df <- df %>%
+  mutate(across(all_of(cols_with_zeros), ~na_if(., 0)))
+
+for (col in cols_with_zeros) {
+  median_value <- median(df[[col]], na.rm = TRUE)
+  df[[col]][is.na(df[[col]])] <- median_value
+}
+ggplot() +
+  geom_density(mapping = aes(x = df_original$Glucose),
+               fill = "red", alpha = 0.4) +
+  geom_density(mapping = aes(x = df$Glucose),
+               fill = "green", alpha = 0.4) +
+  labs(
+    title = "Distribution de Glucose avant (rouge) et après nettoyage (vert)",
+    x = "Glucose",
+    y = "Densité"
+  ) +
+  theme_minimal()
+
+
+
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+# Étape 1 : Créer BMICategory
+
+df <- df %>%
+  mutate(
+    BMICategory = case_when(
+      BMI < 18.5 ~ "Underweight",
+      BMI >= 18.5 & BMI < 25 ~ "Normal",
+      BMI >= 25 & BMI < 30 ~ "Overweight",
+      BMI >= 30 ~ "Obese"
+    )
+  )
+df
+#verif rapide
+table(df$BMICategory)
+
+```
+
+
+
+```{r}
+# Étape 2 : Créer BPCategory
+
+df <- df %>%
+  mutate(
+    BPCategory = case_when(
+      BloodPressure < 80 ~ "Normal",
+      BloodPressure >= 80 & BloodPressure < 90 ~ "Elevated",
+      BloodPressure >= 90 ~ "High"
+    )
+  )
+df
+
+# Vérif rapide
+table(df$BPCategory)
+
+
+```
+
+
+```{r}
+# Étape 3 : Standardiser les colonnes numériques
+
+numeric_cols <- names(df)[sapply(df, is.numeric)]
+numeric_cols <- setdiff(numeric_cols, "Outcome")  # on ne touche pas à la cible
+
+df_scaled <- df %>%
+  mutate(across(all_of(numeric_cols), scale))
+
+df_scaled
+```
+
+
+```{r}
+# Étape 4 : Transformer Outcome en facteur lisible
+
+df_scaled <- df_scaled %>%
+  mutate(
+    Outcome = factor(
+      Outcome,
+      levels = c(0, 1),
+      labels = c("Not Diabetic", "Diabetic")
+    )
+  )
+df_scaled
+
+
+
+```
+
+
+
+```{r}
+#J’ai regroupé tout le code dans un seul bloc, car j’ai remarqué qu’après la standardisation, le programme utilisait les valeurs déjà standardisées pour calculer ou transformer certaines variables (notamment Outcome), ce qui entraînait l’apparition de valeurs manquantes (NA).
+#En exécutant tout le code depuis le début dans un seul bloc, on s’assure que les données sont toujours traitées dans le bon ordre et à partir des valeurs d’origine, ce qui évite ces incohérences.
+
+library(dplyr)
+
+# 1️⃣ Recharger les données d'origine
+df <- read.csv("diabetes.csv")
+
+# 2️⃣ Nettoyer les zéros impossibles
+cols_with_zeros <- c("Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI")
+df <- df %>%
+  mutate(across(all_of(cols_with_zeros), ~na_if(., 0)))
+
+for (col in cols_with_zeros) {
+  median_value <- median(df[[col]], na.rm = TRUE)
+  df[[col]][is.na(df[[col]])] <- median_value
+}
+
+# 3️⃣ Créer BMICategory
+df <- df %>%
+  mutate(
+    BMICategory = case_when(
+      BMI < 18.5 ~ "Underweight",
+      BMI >= 18.5 & BMI < 25 ~ "Normal",
+      BMI >= 25 & BMI < 30 ~ "Overweight",
+      BMI >= 30 ~ "Obese"
+    )
+  )
+
+# 4️⃣ Créer BPCategory
+df <- df %>%
+  mutate(
+    BPCategory = case_when(
+      BloodPressure < 80 ~ "Normal",
+      BloodPressure >= 80 & BloodPressure < 90 ~ "Elevated",
+      BloodPressure >= 90 ~ "High"
+    )
+  )
+
+# 5️⃣ Standardiser les colonnes numériques
+numeric_cols <- names(df)[sapply(df, is.numeric)]
+numeric_cols <- setdiff(numeric_cols, "Outcome")
+
+df_scaled <- df %>%
+  mutate(across(all_of(numeric_cols), scale))
+
+# 6️⃣ Transformer Outcome en facteur
+df_scaled <- df_scaled %>%
+  mutate(
+    Outcome = factor(
+      Outcome,
+      levels = c(0, 1),
+      labels = c("Not Diabetic", "Diabetic")
+    )
+  )
+df_scaled
+
+# 7️⃣ Vérifications
+table(df_scaled$Outcome)
+summary(df_scaled$BMICategory)
+summary(df_scaled$BPCategory)
+
+```
+
