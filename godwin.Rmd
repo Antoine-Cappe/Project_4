@@ -40,41 +40,6 @@ sapply(df[cols_with_zeros], function(x) sum(x == 0))
 ```
 
 
-```{r}
-rm(list = ls())
-gc()
-library(ggplot2)
-library(dplyr)
-
-# Charger les deux versions du dataset
-df_original <- read.csv("diabetes.csv")
-
-df <- df_original
-cols_with_zeros <- c("Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI")
-
-df <- df %>%
-  mutate(across(all_of(cols_with_zeros), ~na_if(., 0)))
-
-for (col in cols_with_zeros) {
-  median_value <- median(df[[col]], na.rm = TRUE)
-  df[[col]][is.na(df[[col]])] <- median_value
-}
-ggplot() +
-  geom_density(mapping = aes(x = df_original$Glucose),
-               fill = "red", alpha = 0.4) +
-  geom_density(mapping = aes(x = df$Glucose),
-               fill = "green", alpha = 0.4) +
-  labs(
-    title = "Distribution de Glucose avant (rouge) et après nettoyage (vert)",
-    x = "Glucose",
-    y = "Densité"
-  ) +
-  theme_minimal()
-
-
-
-```
-
 
 ```{r}
 library(dplyr)
@@ -212,6 +177,135 @@ df_scaled
 table(df_scaled$Outcome)
 summary(df_scaled$BMICategory)
 summary(df_scaled$BPCategory)
+
+```
+
+
+
+```{r}
+ library(ggplot2)
+
+# Recharger les données brutes pour comparaison
+df_original <- read.csv("diabetes.csv")
+
+ggplot() +
+  geom_density(data = df_original, aes(x = Glucose),
+               fill = "red", alpha = 0.4) +
+  geom_density(data = df, aes(x = Glucose),
+               fill = "green", alpha = 0.4) +
+  labs(
+    title = "Distribution du Glucose avant (rouge) et après nettoyage (vert)",
+    x = "Taux de Glucose", y = "Densité"
+  ) +
+  theme_minimal()
+
+
+```
+
+
+```{r}
+ggplot(df_scaled, aes(x = Glucose, fill = Outcome)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "Distribution du Glucose selon l'état diabétique",
+    x = "Glucose (standardisé)", y = "Densité"
+  ) +
+  theme_minimal()
+### Glucose distribution by diabetes status
+
+#The plot above compares glucose levels between diabetic and non-diabetic patients.  
+#We can clearly observe that diabetic patients (in blue) tend to have higher glucose values,  
+#while non-diabetic patients (in pink) are concentrated around lower values.  
+#The small overlap between the two curves corresponds to borderline or pre-diabetic cases.  
+#This visualization confirms that glucose is one of the most discriminating factors for detecting diabetes.
+
+```
+
+
+```{r}
+# BMI
+ggplot(df_scaled, aes(x = BMI, fill = Outcome)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "Distribution du BMI selon l'état diabétique",
+    x = "Indice de Masse Corporelle (standardisé)", y = "Densité"
+  ) +
+  theme_minimal()
+
+# Âge
+ggplot(df_scaled, aes(x = Age, fill = Outcome)) +
+  geom_density(alpha = 0.5) +
+  labs(
+    title = "Distribution de l'âge selon l'état diabétique",
+    x = "Âge (standardisé)", y = "Densité"
+  ) +
+  theme_minimal()
+
+```
+
+
+
+```{r}
+
+library(GGally)
+
+numeric_cols <- names(df_scaled)[sapply(df_scaled, is.numeric)]
+corr_data <- df_scaled[, numeric_cols]
+
+ggcorr(corr_data, label = TRUE, label_round = 2, hjust = 1, size = 3) +
+  ggtitle("Matrice de corrélation entre les variables numériques")
+
+### Correlation Matrix Analysis
+
+#The correlation matrix highlights how numerical variables relate to each other.
+
+#- The strongest positive correlation (0.54) is between *SkinThickness* and *BMI*, 
+ # indicating that higher BMI values are associated with greater skinfold thickness.
+#- *Glucose* and *Insulin* show a moderate positive correlation (0.42), 
+ # which makes sense medically since high glucose levels often lead to increased insulin production.
+#- *Pregnancies* and *Age* also correlate (0.54), 
+  #as older women tend to have had more pregnancies.
+#- Other variables show only weak correlations, 
+ # suggesting that each feature provides distinct information for modeling.
+
+#Overall, there is no sign of high multicollinearity between predictors, 
+#meaning all features can be safely included in the modeling step.
+
+```
+
+
+```{r}
+ggplot(df_scaled, aes(x = Age, y = DiabetesPedigreeFunction, color = Outcome)) +
+  geom_point(alpha = 0.7, size = 3) +
+  labs(
+    title = "Lien entre l'âge et la fonction héréditaire du diabète",
+    x = "Âge (standardisé)", y = "Diabetes Pedigree Function"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+ggplot(df_scaled, aes(x = BMICategory, y = BMI, fill = Outcome)) +
+  geom_boxplot(alpha = 0.6) +
+  labs(
+    title = "Répartition du BMI par catégorie et par état diabétique",
+    x = "Catégorie BMI", y = "BMI (standardisé)"
+  ) +
+  theme_minimal()
+
+```
+
+
+```{r}
+ggplot(df_scaled, aes(x = BPCategory, fill = Outcome)) +
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Répartition du diabète selon la catégorie de tension artérielle",
+    x = "Catégorie de pression artérielle", y = "Nombre de patientes"
+  ) +
+  theme_minimal()
 
 ```
 
