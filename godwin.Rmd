@@ -244,7 +244,6 @@ ggplot(df_scaled, aes(x = Age, fill = Outcome)) +
 ```
 
 
-
 ```{r}
 
 library(GGally)
@@ -309,8 +308,154 @@ ggplot(df_scaled, aes(x = BPCategory, fill = Outcome)) +
 
 ```
 
+```{r}
+# -----------------------------------------------
+# STEP 4.1 : Préparation des données
+# -----------------------------------------------
+ 
+# On retire la colonne "Outcome" du jeu de données pour obtenir les variables explicatives X
+X <- df_scaled %>% select(-Outcome)
+ 
+# On garde la colonne Outcome (la variable à prédire : Diabetic / Not Diabetic)
+y <- df_scaled$Outcome
+ 
+# On crée un échantillon d'entraînement (80%) et un échantillon de test (20%)
+# createDataPartition() sépare le jeu de données tout en gardant le même ratio
+train_index <- createDataPartition(y, p = 0.8, list = FALSE)
+ 
+# Jeu d'entraînement (pour apprendre le modèle)
+X_train <- X[train_index, ]
+y_train <- y[train_index]
+ 
+# Jeu de test (pour évaluer le modèle sur des données nouvelles)
+X_test <- X[-train_index, ]
+y_test <- y[-train_index]
+```
 
 ```{r}
-k
+# -----------------------------------------------
+
+# STEP 4.2 : Modèle 1 — Régression Logistique
+
+# -----------------------------------------------
+ 
+# On entraîne une régression logistique sur les données d'entraînement
+
+# method = "glm" et family = "binomial" → modèle de régression logistique
+
+model_log <- train(
+
+  Outcome ~ ., 
+
+  data = df_scaled[train_index, ],
+
+  method = "glm",
+
+  family = "binomial"
+
+)
+ 
+# On fait des prédictions sur le jeu de test
+
+pred_log <- predict(model_log, newdata = df_scaled[-train_index, ])
+ 
+# On évalue la performance du modèle avec une matrice de confusion
+
+conf_log <- confusionMatrix(pred_log, y_test)
+ 
+# On affiche les résultats
+
+conf_log
+ 
+```
+```{r}
+# -----------------------------------------------
+
+# STEP 4.3 : Modèle 2 — K-Nearest Neighbors (KNN)
+
+# -----------------------------------------------
+ 
+# Le modèle KNN classe chaque patiente selon les K patientes les plus proches
+
+model_knn <- train(
+
+  Outcome ~ ., 
+
+  data = df_scaled[train_index, ],
+
+  method = "knn",
+
+  tuneLength = 10   # test de plusieurs valeurs de K automatiquement
+
+)
+ 
+# Prédictions sur le jeu de test
+
+pred_knn <- predict(model_knn, newdata = df_scaled[-train_index, ])
+ 
+# Matrice de confusion pour évaluer les résultats
+
+conf_knn <- confusionMatrix(pred_knn, y_test)
+ 
+# Afficher les résultats
+
+conf_knn
+
+```
+```{r}
+# -----------------------------------------------
+# STEP 4.4 : Comparaison des modèles
+# -----------------------------------------------
+ 
+# On rassemble les deux modèles pour les comparer
+results <- resamples(list(Logistic = model_log, KNN = model_knn))
+ 
+# Résumé des performances (accuracy, kappa, etc.)
+summary(results)
+ 
+# Visualisation sous forme de boxplot (pour comparer la stabilité)
+bwplot(results, main = "Comparaison des modèles (Accuracy)")
+```
+
+```{r}
+# -----------------------------------------------
+# STEP 4.5 : Impact du nettoyage (avant vs après)
+# -----------------------------------------------
+ 
+# Charger les données originales (non nettoyées)
+df_dirty <- read.csv("diabetes.csv")
+ 
+# Convertir la variable Outcome en facteur (catégorielle)
+df_dirty$Outcome <- factor(df_dirty$Outcome,
+                           levels = c(0, 1),
+                           labels = c("Not Diabetic", "Diabetic"))
+ 
+# Entraîner une régression logistique sur les données brutes
+model_dirty <- train(
+  Outcome ~ ., 
+  data = df_dirty,
+  method = "glm", 
+  family = "binomial"
+)
+ 
+# Faire des prédictions sur le même jeu
+pred_dirty <- predict(model_dirty, newdata = df_dirty)
+ 
+# Évaluer la performance du modèle non nettoyé
+conf_dirty <- confusionMatrix(pred_dirty, df_dirty$Outcome)
+ 
+# Afficher la matrice de confusion
+conf_dirty
+
+```
+```{r}
+# -----------------------------------------------
+# STEP 4.6 : Résumé global des performances
+# -----------------------------------------------
+ 
+cat("=== Résumé des modèles ===\n")
+cat("Régression Logistique (Nettoyée) → Accuracy :", round(conf_log$overall["Accuracy"], 3), "\n")
+cat("KNN (Nettoyé) → Accuracy :", round(conf_knn$overall["Accuracy"], 3), "\n")
+cat("Régression Logistique (Brute) → Accuracy :", round(conf_dirty$overall["Accuracy"], 3), "\n")
 ```
 
