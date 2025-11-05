@@ -311,6 +311,6 @@ ggplot(df_scaled, aes(x = BPCategory, fill = Outcome)) +
 
 
 ```{r}
-kj
+k
 ```
 
