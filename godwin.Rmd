@@ -244,7 +244,6 @@ ggplot(df_scaled, aes(x = Age, fill = Outcome)) +
 ```
 
 
-
 ```{r}
 
 library(GGally)
@@ -310,7 +309,4 @@ ggplot(df_scaled, aes(x = BPCategory, fill = Outcome)) +
 ```
 
 
-```{r}
-k
-```
 
