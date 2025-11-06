@@ -3,7 +3,7 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-**PROJECT 4: Pima Diabetes - Detecting Diabetes from Imperfect Medical Data**
+# **PROJECT 4: Pima Diabetes - Detecting Diabetes from Imperfect Medical Data**
 
 Project Goal : As data analysts in the healthcare sector, your team must build a model to predict the likelihood of diabetes in female patients of Pima Indian heritage. The primary challenge of this dataset is the presence of "impossible" data (zero values for biological measurements) that mask missing values. Your success will depend on your ability to identify and correct these anomalies before modeling.
 
@@ -20,7 +20,7 @@ library(ggplot2)
 library(GGally)
 ```
 
-**Step 1: Data Cleaning and Preparation**
+## **Step 1: Data Cleaning and Preparation**
 
 First, we import the data. Then we look at the beginning of the table to familiarize ourselves with it. And we create a summary to get an overview of the range of numerical values.
 
@@ -67,4 +67,65 @@ cat("\n") # Ajout d'une ligne vide
 sapply(df[cols_with_zeros], function(x) sum(x == 0))
 ```
 
-**Step 2: Feature Transformation and Engineering**
+## **Step 2: Feature Transformation and Engineering**
+
+Before starting the analysis, we need to perform some transformations on our data.
+
+
+
+### **Part 1: Creating BMI Categories**
+
+Create a new categorical variable BMICategory from BMI using the World Health Organization's standard thresholds.
+
+```{r}
+#standard WHO thresholds: underweight, normal weight, overweight, obese
+df <- df %>% 
+  mutate(BMICategory = case_when(BMI<18.5 ~ 'Underweight', 
+                                 BMI>=18.5 & BMI<25 ~ 'Normal weight', 
+                                 BMI>=25 & BMI<30 ~ 'Overweight', BMI>=30 ~ 'Obese'),
+         BMICategory = factor(BMICategory, levels = c('Underweight', 'Normal weight', 'Overweight',
+                                                      'Obese')))
+df %>% count(BMICategory)
+```
+
+### **Part 2: Creating Blood Pressure Categories**
+
+Similarly, we create a BPCategory variable from BloodPressure
+
+```{r}
+#blood pressure categories: low, normal, elevated, high 
+df <- df %>% 
+  mutate(BPCategory = case_when(BloodPressure < 60 ~ "Low", 
+                                BloodPressure >= 60 & BloodPressure < 80 ~ "Normal",
+                                BloodPressure >= 80 & BloodPressure < 90 ~ "Elevated", 
+                                BloodPressure >= 90 ~ "High"),
+         BPCategory = factor(BPCategory, levels = c("Low", "Normal", "Elevated", "High")))
+
+df %>% count(BPCategory)
+```
+
+### **Part 3: Target Transformation**
+
+Now, we ensure the target variable Outcome is a factor with clear labels (e.g., "Diabetic", "Not Diabetic") for interpretability.
+
+```{r}
+df <- df %>% mutate(OutcomeLabel = case_when(Outcome==0 ~ 'Not Diabetic', 
+                                                 Outcome==1 ~ 'Diabetic'),
+                    OutcomeLabel = factor(OutcomeLabel, levels = c("Not Diabetic", "Diabetic")))
+df %>% count(OutcomeLabel)
+```
+
+
+### **Part 4: Standardizing Variables**
+
+Center and scale all numeric columns so their mean becomes 0 and their standard deviation becomes 1.
+
+```{r}
+numeric_cols <- names(df)[sapply(df, is.numeric)]
+numeric_cols <- setdiff(numeric_cols, "Outcome")  # on ne touche pas à la cible
+
+df_scaled <- df %>%
+  mutate(across(all_of(numeric_cols), scale))
+
+head(df_scaled)
+```
