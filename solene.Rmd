@@ -2,26 +2,64 @@
 title: "R Notebook"
 output: html_notebook
 ---
-```{r}
+```{r, include=FALSE}
+# echo false pour toutes les cellules
+knitr::opts_chunk$set(echo = FALSE) 
+
+# Deleting previous environment
+rm(list = ls())
+
+# Importing needed libraries
 library(dplyr)
+library(ggplot2)
+library(GGally)
 ```
-Step 1: Data Cleaning and Preparation 
+
+## **Step 1: Data Cleaning and Preparation**
+
+First, we import the data. Then we look at the beginning of the table to familiarize ourselves with it. And we create a summary to get an overview of the range of numerical values.
 
 ```{r}
 data = read.csv('diabetes.csv')
-data 
+head(data)
+summary(data) 
 ```
 
+We observe that certain values are 0. However, this does not always make sense in a medical context. We deduce that these values are missing. We will replace them with ‘NA’.
+
 ```{r}
-summary(data)
+cols_with_zeros = c("Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI")
+
+# Remplacer les zéros par NA dans ces colonnes
+data = data %>%
+  mutate(across(all_of(cols_with_zeros), ~na_if(., 0)))
+
+head(data)
 ```
+
+The ‘NA’ value count:
+
 ```{r}
-data$Glucose[data$Glucose == 0] <- NA
-data$BloodPressure[data$BloodPressure == 0] <- NA
-data$SkinThickness[data$SkinThickness == 0] <- NA
-data$Insulin[data$Insulin == 0] <- NA
-data$BMI[data$BMI == 0] <- NA
-summary(data)
+colSums(is.na(data))
+```
+
+In order to analyze our dataset, we need to fill in the ‘NA’ values. We choose to replace them with the median of their respective column.
+
+```{r}
+for (col in cols_with_zeros) {
+  median_value = median(data[[col]], na.rm = TRUE)
+  data[[col]][is.na(data[[col]])] = median_value
+}
+
+head(data)
+```
+
+All ‘NA’ values have been replaced & no more 0 remains:
+
+```{r}
+colSums(is.na(data))
+cat("\n") # Ajout d'une ligne vide
+sapply(data[cols_with_zeros], function(x) sum(x == 0))
 ```
 Step 2: Feature Transformation and Engineering 
 

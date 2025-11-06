@@ -190,11 +190,11 @@ df_original <- read.csv("diabetes.csv")
 
 ggplot() +
   geom_density(data = df_original, aes(x = Glucose),
-               fill = "red", alpha = 0.4) +
+               fill = "red", alpha = 0.3) +
   geom_density(data = df, aes(x = Glucose),
-               fill = "green", alpha = 0.4) +
+               fill = "yellow", alpha = 0.5) +
   labs(
-    title = "Distribution du Glucose avant (rouge) et après nettoyage (vert)",
+    title = "Distribution du Glucose avant (rouge) et après nettoyage (jaune)",
     x = "Taux de Glucose", y = "Densité"
   ) +
   theme_minimal()
@@ -314,10 +314,10 @@ ggplot(df_scaled, aes(x = BPCategory, fill = Outcome)) +
 # -----------------------------------------------
  
 # On retire la colonne "Outcome" du jeu de données pour obtenir les variables explicatives X
-X <- df_scaled %>% select(-Outcome)
+X <- df_scaled %>% select(-OutcomeLabel)
  
 # On garde la colonne Outcome (la variable à prédire : Diabetic / Not Diabetic)
-y <- df_scaled$Outcome
+y <- df_scaled$OutcomeLabel
  
 # On crée un échantillon d'entraînement (80%) et un échantillon de test (20%)
 # createDataPartition() sépare le jeu de données tout en gardant le même ratio
