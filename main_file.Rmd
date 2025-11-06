@@ -209,7 +209,7 @@ ggplot(df_scaled, aes(x = BloodPressure, y = Age , color = OutcomeLabel)) +
 gregrerer
 
 ```{r}
-set.seed(123)
+set.seed(0)
 train_index <- sample(1:nrow(df_scaled), 0.8 * nrow(df_scaled))
 train_data <- df_scaled[train_index, ]
 test_data <- df_scaled[-train_index, ]
