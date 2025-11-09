@@ -151,6 +151,7 @@ summary(model)
 #data$Predict <- predict(model, type='response')
 
 ```
+
 ```{r}
 library("caret")
 set.seed(123)
@@ -168,11 +169,11 @@ accuracy <- mean(test_data$PredictedClass == test_data$Outcome)
 
 confusion_matrix
 
-
+accuracy <- mean(test_data$PredictedClass == test_data$Outcome)
+accuracy
 
 #formula <- (89+29)/(89+23+13+29)
 #formula
-
 
 
 #summary(model)
@@ -180,26 +181,85 @@ confusion_matrix
 #df_scaled$Predict
 #exp(coef(model))
 ```
-
+KNN MODEL 
 
 ```{r}
-#knn model 
-library(class)
-knn_model <- knn()
-#still to do...
-```
+#knn model
 
+library(class)
+set.seed(123)
+train_index <- sample(1:nrow(df_scaled), 0.8 * nrow(df_scaled))
+train_data <- df_scaled[train_index, ]
+test_data <- df_scaled[-train_index, ]
+
+train_X <- train_data[, c("Glucose", "BMI", "Age", "DiabetesPedigreeFunction", "Pregnancies", "BloodPressure", "SkinThickness")]
+test_X <- test_data[, c("Glucose", "BMI", "Age", "DiabetesPedigreeFunction", "Pregnancies", "BloodPressure", "SkinThickness")]
+
+train_Y <- as.factor(train_data$Outcome)
+test_Y <- as.factor(test_data$Outcome)
+
+k <- 3
+model_knn_predicted <- knn(train = train_X, test = test_X, cl = train_Y, k = k)
+
+confusion_matrix_knn <- table(Predicted = model_knn_predicted, Actual = test_Y)
+confusion_matrix_knn 
+
+accuracy_knn <- mean(model_knn_predicted == test_Y)
+accuracy_knn
+
+formula <- (91+32)/(91+11+20+32)
+formula
+
+```
+CROSS VALIDATION
 ```{r}
 library(caret)
-```
 
-```{r}
-#cross-validation
+df_scaled$Outcome <- as.factor(df_scaled$Outcome)
+
 training <- trainControl(method='cv',number=10)
 
-model <- train(Outcome ~.,data=data, method = 'glm', family='binomial', trControl=training)
+set.seed(123)
 
-#doesn't work yet because of the NA values 
+#training of the two models again 
+
+model_TWO <- train(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = df_scaled, method = "glm", family = "binomial", trControl = training)
+
+model_TWO_knn <- train(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = df_scaled, method = "knn", trControl = training, tuneLength = 10)
+
+model_TWO$results
+model_TWO_knn$results
+
+model_TWO$results$Accuracy
+model_TWO_knn$results$Accuracy
+
+
+plot(model_TWO_knn)
+#the plot shows us that the higher the k the more accurate 
+```
+
+ 
+LOGISTIC MODEL WITH RAW DATA 
+```{r}
+set.seed(123)
+train_index_zeros <- sample(1:nrow(data), 0.8 * nrow(data))
+train_data_zeros <- data[train_index_zeros, ]
+test_data_zeros <- data[-train_index_zeros, ]
+
+model_with_zeros <- glm(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = train_data_zeros, family = binomial)
+
+test_data_zeros$PredictedProb <- predict(model_with_zeros, newdata = test_data_zeros, type = "response")
+test_data_zeros$PredictedClass <- ifelse(test_data_zeros$PredictedProb > 0.5, 1, 0)
+
+confusion_matrix_zeros <- table(Predicted = test_data_zeros$PredictedClass, Actual = test_data_zeros$Outcome)
+
+confusion_matrix
+
+accuracy_zeros <- mean(test_data_zeros$PredictedClass == test_data_zeros$Outcome)
+accuracy_zeros
+
+#for now it gives the same because my data is cleaned, when we put into main it should work and give a worst version than the previous one 
 
 ```
+
 
