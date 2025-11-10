@@ -312,7 +312,7 @@ plot(model_TWO_knn)
 
 ### **Part 4: Analyzing the Impact of Cleaning**
 
-???
+The model trained on uncleaned data achieves higher accuracy solely because it exploits unrealistic zero values as artificial indicators of diagnosis. After cleaning, accuracy decreases slightly, but performance becomes more reliable and more representative of real-world usage.
 
 ```{r}
 df = read.csv('diabetes.csv')
