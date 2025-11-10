@@ -310,9 +310,13 @@ plot(model_TWO_knn)
 ```
 
 
-### **Part 4: Analyzing the Impact of Cleaning**  
+### **Part 4: Analyzing the Impact of Cleaning**
+
+???
 
 ```{r}
+df = read.csv('diabetes.csv')
+
 set.seed(123)
 train_index_zeros <- sample(1:nrow(df), 0.8 * nrow(df))
 train_data_zeros <- df[train_index_zeros, ]
@@ -325,12 +329,11 @@ test_data_zeros$PredictedClass <- ifelse(test_data_zeros$PredictedProb > 0.5, 1,
 
 confusion_matrix_zeros <- table(Predicted = test_data_zeros$PredictedClass, Actual = test_data_zeros$Outcome)
 
-confusion_matrix
+confusion_matrix_zeros
 
+cat("\n")
 accuracy_zeros <- mean(test_data_zeros$PredictedClass == test_data_zeros$Outcome)
 accuracy_zeros
-
-#for now it gives the same because my data is cleaned, when we put into main it should work and give a worst version than the previous one 
 
 ```
 
