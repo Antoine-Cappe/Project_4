@@ -20,6 +20,7 @@ library(ggplot2)
 library(gridExtra)  # pour arranger les graphes
 library(GGally)
 library(caret)
+library(class)
 ```
 
 ## **Step 1: Data Cleaning and Preparation**
@@ -131,7 +132,8 @@ head(df_scaled)
 
 ## **Step 3: Visualization and Exploration (with ggplot2)**
 
-blablabla
+Now that our data has been cleaned, we can begin the analysis.
+Let's first look at the impact of cleaning on glucose value distributions.
 
 ```{r}
 # Recharger les données brutes pour comparaison
@@ -155,6 +157,8 @@ grid.arrange(p1, p2, ncol = 2)
 
 ### **Part 1: Comparing Distributions**
 
+Now let's look at the distribution of BMI and age according to whether or not the patient has diabetes.
+
 ```{r}
 #distribution of BMI and age between diabetic and non-diabetic patients 
 
@@ -166,9 +170,12 @@ plot_bmi
 plot_age
 ```
 
+It can be observed that diabetes is associated with a higher BMI than among non-diabetic patients.
+
+
 ### **Part 2: Correlation Between Predictors**
 
-jebcebzopeizfhpiez
+Here we calculate the correlation matrix between all numerical variables to identify those that are correlated.
 
 ```{r}
 numeric_cols <- names(df_scaled)[sapply(df_scaled, is.numeric)]
@@ -180,7 +187,12 @@ ggcorr(corr_data, label = TRUE, label_round = 2, hjust = 1, size = 3) +
   theme(plot.margin = margin(20, 100, 20, 100)) # augmente les marges (top, right, bottom, left
 ```
 
+There is a strong correlation between diabetes rates and glucose levels. As expected.
+
+
 ### **Part 3: Analyzing Pedigree**
+
+On the contrary, if we visualize two variables that have a low correlation score, we cannot distinguish anything in particular.
 
 ```{r}
 ggplot(df_scaled, aes(x = Age, y = DiabetesPedigreeFunction, color = OutcomeLabel)) +
@@ -192,12 +204,14 @@ ggplot(df_scaled, aes(x = Age, y = DiabetesPedigreeFunction, color = OutcomeLabe
 
 ### **Part 4: Visualisations of our choice**
 
-rgrgregregreg
+As announced, glucose distribution is higher in diabetic patients.
 
 ```{r}
 plot_glucose <- ggplot(df_scaled, aes(x=Glucose, fill=OutcomeLabel)) + labs(title = 'Glucose distribution', x='glucose', fill='Outcome') + geom_density(alpha = 0.5) 
 plot_glucose
 ```
+
+Another thing that was to be expected: blood pressure increases with age.
 
 ```{r}
 ggplot(df_scaled, aes(x = BloodPressure, y = Age , color = OutcomeLabel)) +
@@ -206,10 +220,13 @@ ggplot(df_scaled, aes(x = BloodPressure, y = Age , color = OutcomeLabel)) +
 
 ## **Step 4:  Modeling and Prediction (Data Science)**
 
-gregrerer
+### **Part 1: Logistic Regression Model**
+
+We train a logistic regression model (A model that predicts the probability of a binary event occurring) on the standardized data.
+The training data volume represents 80% of the total data. The model is tested on the remaining 20%.
 
 ```{r}
-set.seed(0)
+set.seed(123)
 train_index <- sample(1:nrow(df_scaled), 0.8 * nrow(df_scaled))
 train_data <- df_scaled[train_index, ]
 test_data <- df_scaled[-train_index, ]
@@ -223,8 +240,97 @@ confusion_matrix <- table(Predicted = test_data$PredictedClass, Actual = test_da
 accuracy <- mean(test_data$PredictedClass == test_data$Outcome)
 
 confusion_matrix
+
+formula <- (89+29)/(89+23+13+29)
+cat("\n")
+formula
+```
+
+This model allow you to see the effect (positive or negative) of each variable.
+
+```{r}
+summary(model)
+```
+
+### **Part 2: k-Nearest Neighbors (KNN) Model**
+
+A KNN model classifies a patient based on the majority class of their closest "neighbors" in the feature space.
+At first, we take k=3.
+
+```{r}
+set.seed(123)
+train_index <- sample(1:nrow(df_scaled), 0.8 * nrow(df_scaled))
+train_data <- df_scaled[train_index, ]
+test_data <- df_scaled[-train_index, ]
+
+train_X <- train_data[, c("Glucose", "BMI", "Age", "DiabetesPedigreeFunction", "Pregnancies", "BloodPressure", "SkinThickness")]
+test_X <- test_data[, c("Glucose", "BMI", "Age", "DiabetesPedigreeFunction", "Pregnancies", "BloodPressure", "SkinThickness")]
+
+train_Y <- as.factor(train_data$Outcome)
+test_Y <- as.factor(test_data$Outcome)
+
+k <- 3
+model_knn_predicted <- knn(train = train_X, test = test_X, cl = train_Y, k = k)
+
+confusion_matrix_knn <- table(Predicted = model_knn_predicted, Actual = test_Y)
+confusion_matrix_knn 
+
+cat("\n")
+accuracy_knn <- mean(model_knn_predicted == test_Y)
+accuracy_knn
+```
+
+### **Part 3: Cross-Validation**
+
+Cross-validation involves dividing your dataset into several subsets to train your model on one part and test it on the others, in order to evaluate its performance more reliably and avoid overfitting.
+
+This second version of the LRM offers greater precision than the previous one.
+
+```{r}
+df_scaled$Outcome <- as.factor(df_scaled$Outcome)
+
+training <- trainControl(method='cv',number=10)
+
+set.seed(123)
+
+#training of the two models again 
+
+model_TWO <- train(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = df_scaled, method = "glm", family = "binomial", trControl = training)
+
+model_TWO_knn <- train(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = df_scaled, method = "knn", trControl = training, tuneLength = 10)
+
+model_TWO$results
+
+```
+
+The plot shows us that: the higher the k the more accurate is the model.
+
+```{r}
+plot(model_TWO_knn)
 ```
 
 
+### **Part 4: Analyzing the Impact of Cleaning**  
 
+```{r}
+set.seed(123)
+train_index_zeros <- sample(1:nrow(df), 0.8 * nrow(df))
+train_data_zeros <- df[train_index_zeros, ]
+test_data_zeros <- df[-train_index_zeros, ]
+
+model_with_zeros <- glm(Outcome ~ Glucose + BMI + Age + DiabetesPedigreeFunction + Pregnancies + BloodPressure + SkinThickness, data = train_data_zeros, family = binomial)
+
+test_data_zeros$PredictedProb <- predict(model_with_zeros, newdata = test_data_zeros, type = "response")
+test_data_zeros$PredictedClass <- ifelse(test_data_zeros$PredictedProb > 0.5, 1, 0)
+
+confusion_matrix_zeros <- table(Predicted = test_data_zeros$PredictedClass, Actual = test_data_zeros$Outcome)
+
+confusion_matrix
+
+accuracy_zeros <- mean(test_data_zeros$PredictedClass == test_data_zeros$Outcome)
+accuracy_zeros
+
+#for now it gives the same because my data is cleaned, when we put into main it should work and give a worst version than the previous one 
+
+```
 
